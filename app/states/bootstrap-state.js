@@ -1,21 +1,20 @@
 import STATE_EVENTS from '../constants/state-events';
 
 export class BootstrapState extends Phaser.State {
+    
+    init( level_file ) {
+        this.level_file = level_file;
+    }
+    
     preload() {
-        this.load.image('loader', 'assets/images/loader.png');
+        this.load.text( 'level1', this.level_file );
     }
 
     create() {
-        this.game.stage.backgroundColor = '#000000';
+        var level_text  = this.game.cache.getText( 'level1' );
+        var level_data  = JSON.parse( level_text );
 
-        this.game.trigger(STATE_EVENTS.BOOTSTRAP_COMPLETED);
-    }
-
-    update() {
-
-    }
-
-    render() {
-
+        // this.game.state.start( 'LoadingState', true, false, level_data );
+        this.game.trigger( STATE_EVENTS.BOOTSTRAP_COMPLETED, [true, false, level_data] );
     }
 }
