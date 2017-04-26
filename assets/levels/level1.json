@@ -7,7 +7,8 @@
         "fruits_spritesheet": {"type": "spritesheet", "source": "assets/images/fruits.png", "frame_width": 28, "frame_height": 28}
     },
     "groups": [
-        "background"
+        "background",
+        "cuts"
     ],
     "prefabs": {
         "background": {
