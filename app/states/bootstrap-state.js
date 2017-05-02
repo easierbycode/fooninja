@@ -14,7 +14,9 @@ export class BootstrapState extends Phaser.State {
         var level_text  = this.game.cache.getText( 'level1' );
         var level_data  = JSON.parse( level_text );
 
-        // this.game.state.start( 'LoadingState', true, false, level_data );
-        this.game.trigger( STATE_EVENTS.BOOTSTRAP_COMPLETED, [true, false, level_data] );
+        this.game.trigger(
+            STATE_EVENTS.BOOTSTRAP_COMPLETED,
+            [true, false, level_data]
+        );
     }
 }

@@ -2,8 +2,11 @@ import GAME from '../constants/game';
 import PLAYER from '../constants/player';
 import STATE_EVENTS from '../constants/state-events';
 import { Cut } from '../models/cut';
+import { Cuttable } from '../models/cuttable';
+import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
+import { Score } from '../models/score';
 
 export class LevelState extends Phaser.State {
 
@@ -16,8 +19,13 @@ export class LevelState extends Phaser.State {
     MINIMUM_SWIPE_LENGTH    = 50;
     
     prefab_classes  = {
-        background  : Prefab.prototype.constructor
+        background  : Prefab.prototype.constructor,
+        score       : Score.prototype.constructor,
+        lives       : Lives.prototype.constructor,
+        cuttable    : Cuttable.prototype.constructor
     }
+    
+    score       = 0;
 
 
     init( level_data ) {
@@ -28,7 +36,7 @@ export class LevelState extends Phaser.State {
         this.scale.pageAlignVertically      = true;
 
         this.game.physics.startSystem( Phaser.Physics.ARCADE );
-        this.game.physics.arcade.gravity.y  = GAME.gravity;
+        this.game.physics.arcade.gravity.y  = 1000;  // GAME.gravity;
     }
     
     create() {
@@ -56,12 +64,17 @@ export class LevelState extends Phaser.State {
     create_prefab( prefab_name, prefab_data ) {
         var prefab_position, prefab;
         
+        // create object according to its type
         if ( this.prefab_classes.hasOwnProperty( prefab_data.type ) ) {
+            
+            // position is percentage
             if ( prefab_data.position.x > 0 && prefab_data.position.x <= 1 ) {
                 prefab_position = new Phaser.Point(
                     prefab_data.position.x * this.game.world.width,
                     prefab_data.position.y * this.game.world.height
                 );
+            
+            // position is absolute number
             } else {
                 prefab_position = prefab_data.position;
             }
@@ -80,18 +93,11 @@ export class LevelState extends Phaser.State {
 
     end_swipe( pointer ) {
         this.end_swipe_point    = new Phaser.Point( pointer.x, pointer.y );
-
-        if ( this.start_swipe_point && this.end_swipe_point ) {
         
-            var swipe_length        = Phaser.Point.distance(
-                this.end_swipe_point,
-                this.start_swipe_point
-            );
-            
-        } else {
-            
-            var swipe_length        = 0;
-        }
+        var swipe_length        = Phaser.Point.distance(
+            this.end_swipe_point,
+            this.start_swipe_point
+        );
 
         if ( swipe_length >= this.MINIMUM_SWIPE_LENGTH ) {
             
@@ -114,6 +120,25 @@ export class LevelState extends Phaser.State {
                 this.end_swipe_point.x,
                 this.end_swipe_point.y
             );
+            
+            this.groups.cuttables.forEachAlive( this.check_collision, this );
         }
+    }
+    
+    check_collision( object ) {
+        var object_rectangle    = new Phaser.Rectangle( object.body.x, object.body.y, object.body.width, object.body.height );
+        
+        var line1               = new Phaser.Line( object_rectangle.left, object_rectangle.bottom, object_rectangle.left, object_rectangle.top );
+        var line2               = new Phaser.Line( object_rectangle.left, object_rectangle.top, object_rectangle.right, object_rectangle.top );
+        var line3               = new Phaser.Line( object_rectangle.right, object_rectangle.top, object_rectangle.right, object_rectangle.bottom );
+        var line4               = new Phaser.Line( object_rectangle.right, object_rectangle.bottom, object_rectangle.left, object_rectangle.bottom );
+        
+        var intersection        = this.swipe.intersects( line1 ) || this.swipe.intersects( line2 ) || this.swipe.intersects( line3 ) || this.swipe.intersects( line4 );
+    
+        if ( intersection )  object.cut();
+    }
+    
+    game_over() {
+        this.game_state.state.restart( true, false, this.level_data );
     }
 }
