@@ -8,7 +8,9 @@
     },
     "groups": [
         "background",
-        "cuts"
+        "cuts",
+        "cuttables",
+        "huds"
     ],
     "prefabs": {
         "background": {
@@ -17,6 +19,52 @@
             "properties": {
                 "texture": "background_image",
                 "group": "background"
+            }
+        },
+        
+        "score": {
+            "type": "score",
+            "position": {
+                "x": 0.05,
+                "y": 0.05
+            },
+            "properties": {
+                "text": "Fruits: ",
+                "style": {
+                    "font": "48px Arial",
+                    "fill": "#fff"
+                },
+                "group": "huds"
+            }
+        },
+        
+        "lives": {
+            "type": "lives",
+            "position": {
+                "x": 0.85,
+                "y": 0.05
+            },
+            "properties": {
+                "texture": "sword_image",
+                "group": "huds",
+                "lives": 3,
+                "lives_spacing": 50
+            }
+        },
+        
+        "cuttable": {
+            "type": "cuttable",
+            "position": {
+                "x": 500,
+                "y": 500
+            },
+            "properties": {
+                "texture": "bomb_image",
+                "group": "cuttables",
+                "velocity": {
+                    "x": 0,
+                    "y": 1000
+                }
             }
         }
     }
