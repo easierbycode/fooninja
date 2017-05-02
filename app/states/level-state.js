@@ -1,8 +1,10 @@
 import GAME from '../constants/game';
 import PLAYER from '../constants/player';
 import STATE_EVENTS from '../constants/state-events';
+import { Bomb } from '../models/bomb';
 import { Cut } from '../models/cut';
 import { Cuttable } from '../models/cuttable';
+import { Fruit } from '../models/fruit';
 import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
@@ -22,7 +24,9 @@ export class LevelState extends Phaser.State {
         background  : Prefab.prototype.constructor,
         score       : Score.prototype.constructor,
         lives       : Lives.prototype.constructor,
-        cuttable    : Cuttable.prototype.constructor
+        cuttable    : Cuttable.prototype.constructor,
+        fruit       : Fruit.prototype.constructor,
+        bomb        : Bomb.prototype.constructor
     }
     
     score       = 0;
@@ -121,7 +125,8 @@ export class LevelState extends Phaser.State {
                 this.end_swipe_point.y
             );
             
-            this.groups.cuttables.forEachAlive( this.check_collision, this );
+            this.groups.fruits.forEachAlive( this.check_collision, this );
+            this.groups.bombs.forEachAlive( this.check_collision, this );
         }
     }
     

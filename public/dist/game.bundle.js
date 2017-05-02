@@ -408,9 +408,13 @@ var _stateEvents = __webpack_require__(0);
 
 var _stateEvents2 = _interopRequireDefault(_stateEvents);
 
+var _bomb = __webpack_require__(20);
+
 var _cut = __webpack_require__(15);
 
 var _cuttable = __webpack_require__(19);
+
+var _fruit = __webpack_require__(21);
 
 var _lives = __webpack_require__(16);
 
@@ -450,7 +454,9 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
             background: _prefab.Prefab.prototype.constructor,
             score: _score.Score.prototype.constructor,
             lives: _lives.Lives.prototype.constructor,
-            cuttable: _cuttable.Cuttable.prototype.constructor
+            cuttable: _cuttable.Cuttable.prototype.constructor,
+            fruit: _fruit.Fruit.prototype.constructor,
+            bomb: _bomb.Bomb.prototype.constructor
         }, _this.score = 0, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
@@ -529,7 +535,8 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
 
                 this.swipe = new Phaser.Line(this.start_swipe_point.x, this.start_swipe_point.y, this.end_swipe_point.x, this.end_swipe_point.y);
 
-                this.groups.cuttables.forEachAlive(this.check_collision, this);
+                this.groups.fruits.forEachAlive(this.check_collision, this);
+                this.groups.bombs.forEachAlive(this.check_collision, this);
             }
         }
     }, {
@@ -949,6 +956,111 @@ var Cuttable = exports.Cuttable = function (_Prefab) {
 
     return Cuttable;
 }(_prefab.Prefab);
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Bomb = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _cuttable = __webpack_require__(19);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Bomb = exports.Bomb = function (_Cuttable) {
+    _inherits(Bomb, _Cuttable);
+
+    function Bomb(game_state, name, position, properties) {
+        _classCallCheck(this, Bomb);
+
+        var _this = _possibleConstructorReturn(this, (Bomb.__proto__ || Object.getPrototypeOf(Bomb)).call(this, game_state, name, position, properties));
+
+        _this.body.setSize(20, 20);
+        return _this;
+    }
+
+    _createClass(Bomb, [{
+        key: 'cut',
+        value: function cut() {
+            _cuttable.Cuttable.prototype.cut.call(this);
+
+            this.game_state.prefabs.lives.die();
+            this.kill();
+        }
+    }]);
+
+    return Bomb;
+}(_cuttable.Cuttable);
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Fruit = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _cuttable = __webpack_require__(19);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Fruit = exports.Fruit = function (_Cuttable) {
+    _inherits(Fruit, _Cuttable);
+
+    function Fruit(game_state, name, position, properties) {
+        _classCallCheck(this, Fruit);
+
+        var _this = _possibleConstructorReturn(this, (Fruit.__proto__ || Object.getPrototypeOf(Fruit)).call(this, game_state, name, position, properties));
+
+        _this.body.setSize(20, 20);
+
+        _this.frames = properties.frames;
+        _this.frame = _this.game_state.game.rnd.pick(_this.frames);
+        return _this;
+    }
+
+    _createClass(Fruit, [{
+        key: 'reset',
+        value: function reset(position_x, position_y, velocity) {
+            var frame_index;
+
+            _cuttable.Cuttable.prototype.reset.call(this, position_x, position_y, velocity);
+
+            this.frame = this.game_state.game.rnd.pick(this.frames);
+        }
+    }, {
+        key: 'cut',
+        value: function cut() {
+            _cuttable.Cuttable.prototype.cut.call(this);
+            this.game_state.score += 1;
+            this.kill();
+        }
+    }]);
+
+    return Fruit;
+}(_cuttable.Cuttable);
 
 /***/ })
 /******/ ]);
