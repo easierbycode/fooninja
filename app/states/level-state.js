@@ -9,6 +9,8 @@ import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
 import { Score } from '../models/score';
+import { SpecialFruit } from '../models/special-fruit';
+
 
 export class LevelState extends Phaser.State {
 
@@ -26,7 +28,8 @@ export class LevelState extends Phaser.State {
         lives       : Lives.prototype.constructor,
         cuttable    : Cuttable.prototype.constructor,
         fruit       : Fruit.prototype.constructor,
-        bomb        : Bomb.prototype.constructor
+        bomb        : Bomb.prototype.constructor,
+        special_fruit   : SpecialFruit.prototype.constructor
     }
     
     score       = 0;
@@ -127,6 +130,7 @@ export class LevelState extends Phaser.State {
             
             this.groups.fruits.forEachAlive( this.check_collision, this );
             this.groups.bombs.forEachAlive( this.check_collision, this );
+            this.groups.special_fruits.forEachAlive( this.check_collision, this );
         }
     }
     

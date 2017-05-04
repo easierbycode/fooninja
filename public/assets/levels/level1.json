@@ -10,6 +10,7 @@
         "background",
         "cuts",
         "fruits",
+        "special_fruits",
         "bombs",
         "huds"
     ],
@@ -79,6 +80,23 @@
             "properties": {
                 "texture": "bomb_image",
                 "group": "bombs",
+                "velocity": {
+                    "x": 0,
+                    "y": 750
+                }
+            }
+        },
+        
+        "special_fruit": {
+            "type": "special_fruit",
+            "position": {
+                "x": 700,
+                "y": 600
+            },
+            "properties": {
+                "texture": "fruits_spritesheet",
+                "group": "special_fruits",
+                "frame": 15,
                 "velocity": {
                     "x": 0,
                     "y": 750
