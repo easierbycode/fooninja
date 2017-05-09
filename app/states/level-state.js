@@ -34,6 +34,7 @@ export class LevelState extends Phaser.State {
         fruit_spawner           : FruitSpawner.prototype.constructor,
         special_fruit_spawner   : SpecialFruitSpawner.prototype.constructor,
         bomb                    : Bomb.prototype.constructor,
+        bomb_spawner            : BombSpawner.prototype.constructor,
         special_fruit           : SpecialFruit.prototype.constructor
     }
     
