@@ -4,7 +4,8 @@
     },
     "groups": [
         "background",
-        "hud"
+        "hud",
+        "menu_items"
     ],
     "prefabs": {
         "background": {
@@ -36,6 +37,24 @@
                     "x": 0.5,
                     "y": 0.5
                 }
+            }
+        },
+        
+        "game_item": {
+            "type": "start_state_item",
+            "position": {
+                "x": 0.5,
+                "y": 0.6
+            },
+            "properties": {
+                "text": "Play",
+                "style": {
+                    "font": "32px Arial",
+                    "fill": "#fff"
+                },
+                "group": "menu_items",
+                "level_file": "assets/levels/level1.json",
+                "state_name": "GameState"
             }
         }
     }
