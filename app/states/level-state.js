@@ -2,14 +2,17 @@ import GAME from '../constants/game';
 import PLAYER from '../constants/player';
 import STATE_EVENTS from '../constants/state-events';
 import { Bomb } from '../models/bomb';
+import { BombSpawner } from '../models/bomb-spawner';
 import { Cut } from '../models/cut';
 import { Cuttable } from '../models/cuttable';
 import { Fruit } from '../models/fruit';
+import { FruitSpawner } from '../models/fruit-spawner';
 import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
 import { Score } from '../models/score';
 import { SpecialFruit } from '../models/special-fruit';
+import { SpecialFruitSpawner } from '../models/special-fruit-spawner';
 
 
 export class LevelState extends Phaser.State {
@@ -23,13 +26,15 @@ export class LevelState extends Phaser.State {
     MINIMUM_SWIPE_LENGTH    = 50;
     
     prefab_classes  = {
-        background  : Prefab.prototype.constructor,
-        score       : Score.prototype.constructor,
-        lives       : Lives.prototype.constructor,
-        cuttable    : Cuttable.prototype.constructor,
-        fruit       : Fruit.prototype.constructor,
-        bomb        : Bomb.prototype.constructor,
-        special_fruit   : SpecialFruit.prototype.constructor
+        background              : Prefab.prototype.constructor,
+        score                   : Score.prototype.constructor,
+        lives                   : Lives.prototype.constructor,
+        cuttable                : Cuttable.prototype.constructor,
+        fruit                   : Fruit.prototype.constructor,
+        fruit_spawner           : FruitSpawner.prototype.constructor,
+        special_fruit_spawner   : SpecialFruitSpawner.prototype.constructor,
+        bomb                    : Bomb.prototype.constructor,
+        special_fruit           : SpecialFruit.prototype.constructor
     }
     
     score       = 0;
@@ -101,10 +106,14 @@ export class LevelState extends Phaser.State {
     end_swipe( pointer ) {
         this.end_swipe_point    = new Phaser.Point( pointer.x, pointer.y );
         
-        var swipe_length        = Phaser.Point.distance(
-            this.end_swipe_point,
-            this.start_swipe_point
-        );
+        if ( !this.start_swipe_point ) {
+            var swipe_length    = 0;
+        } else {
+            var swipe_length    = Phaser.Point.distance(
+                this.end_swipe_point,
+                this.start_swipe_point
+            );
+        }
 
         if ( swipe_length >= this.MINIMUM_SWIPE_LENGTH ) {
             

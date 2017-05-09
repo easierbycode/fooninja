@@ -23,7 +23,7 @@ export class Lives extends Prefab {
             
             this.lives_sprites.push( life );
             
-            this.game_state.groups.huds.add( life );
+            this.game_state.groups[ properties.group ].add( life );
         }
     }
     
