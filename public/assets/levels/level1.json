@@ -1,4 +1,10 @@
 {
+    "world": {
+        "origin_x": 0,
+        "origin_y": 0,
+        "width": 1200,
+        "height": 600
+    },
     "assets": {
         "particle_image": {"type": "image", "source": "assets/images/particle.png"},
         "sword_image": {"type": "image", "source": "assets/images/sword.png"},

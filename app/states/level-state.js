@@ -13,9 +13,10 @@ import { Prefab } from '../models/prefab';
 import { Score } from '../models/score';
 import { SpecialFruit } from '../models/special-fruit';
 import { SpecialFruitSpawner } from '../models/special-fruit-spawner';
+import { JSONLevelState } from './json-level-state';
 
 
-export class LevelState extends Phaser.State {
+export class LevelState extends JSONLevelState {
 
     CUT_STYLE   = {
         line_width  : 5,
@@ -39,14 +40,17 @@ export class LevelState extends Phaser.State {
     }
     
     score       = 0;
-
-
+    
     init( level_data ) {
+        super.init.call( this, level_data );
+        
         this.game.physics.startSystem( Phaser.Physics.ARCADE );
-        this.game.physics.arcade.gravity.y  = 1000;  // GAME.gravity;
+        this.game.physics.arcade.gravity.y  = GAME.gravity;
     }
     
     create() {
+        super.create.call( this );
+
         this.game.input.onDown.add( this.start_swipe, this );
         this.game.input.onUp.add( this.end_swipe, this );
     }
@@ -109,6 +113,6 @@ export class LevelState extends Phaser.State {
     }
     
     game_over() {
-        this.game_state.state.restart( true, false, this.level_data );
+        this.game.state.restart( true, false, this.level_data );
     }
 }
