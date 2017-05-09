@@ -184,7 +184,13 @@ var Prefab = exports.Prefab = function (_Phaser$Sprite) {
 
     _this.game_state.groups[properties.group].add(_this);
 
-    _this.frame = properties.frame;
+    if (properties.frame) {
+      _this.frame = properties.frame;
+    }
+
+    if (properties.anchor) {
+      _this.anchor.setTo(properties.anchor.x, properties.anchor.y);
+    }
 
     _this.game_state.prefabs[name] = _this;
     return _this;
@@ -281,6 +287,8 @@ var _loadingState = __webpack_require__(18);
 
 var _levelState = __webpack_require__(17);
 
+var _titleState = __webpack_require__(28);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -305,6 +313,7 @@ var StateManager = exports.StateManager = function () {
             this.game.state.add('Bootstrap', _bootstrapState.BootstrapState);
             this.game.state.add('Loading', _loadingState.LoadingState);
             this.game.state.add('GameState', _levelState.LevelState);
+            this.game.state.add('TitleState', _titleState.TitleState);
         }
     }, {
         key: 'setupNativeListeners',
@@ -327,14 +336,16 @@ var StateManager = exports.StateManager = function () {
             this.game.on(_stateEvents2.default.LOADING_COMPLETED, function (paramsArr) {
                 var _game$state2;
 
-                (_game$state2 = _this.game.state).start.apply(_game$state2, ['GameState'].concat(_toConsumableArray(paramsArr)));
+                // pop last element (next_state) off paramsArr
+                var next_state = paramsArr.pop();
+
+                (_game$state2 = _this.game.state).start.apply(_game$state2, [next_state].concat(_toConsumableArray(paramsArr)));
             });
         }
     }, {
         key: 'start',
         value: function start() {
-            // this.game.state.start('Bootstrap');
-            this.game.state.start('Bootstrap', true, false, 'assets/levels/level1.json');
+            this.game.state.start('Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState');
         }
     }]);
 
@@ -744,8 +755,9 @@ var BootstrapState = exports.BootstrapState = function (_Phaser$State) {
 
     _createClass(BootstrapState, [{
         key: 'init',
-        value: function init(level_file) {
+        value: function init(level_file, next_state) {
             this.level_file = level_file;
+            this.next_state = next_state;
         }
     }, {
         key: 'preload',
@@ -758,7 +770,7 @@ var BootstrapState = exports.BootstrapState = function (_Phaser$State) {
             var level_text = this.game.cache.getText('level1');
             var level_data = JSON.parse(level_text);
 
-            this.game.trigger(_stateEvents2.default.BOOTSTRAP_COMPLETED, [true, false, level_data]);
+            this.game.trigger(_stateEvents2.default.BOOTSTRAP_COMPLETED, [true, false, level_data, this.next_state]);
         }
     }]);
 
@@ -858,53 +870,14 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
     _createClass(LevelState, [{
         key: 'init',
         value: function init(level_data) {
-            this.level_data = level_data;
-
-            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            this.scale.pageAlignHorizontally = true;
-            this.scale.pageAlignVertically = true;
-
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
             this.game.physics.arcade.gravity.y = 1000; // GAME.gravity;
         }
     }, {
         key: 'create',
         value: function create() {
-            var group_name, prefab_name;
-
-            this.groups = {};
-            this.level_data.groups.forEach(function (group_name) {
-                this.groups[group_name] = this.game.add.group();
-            }, this);
-
-            this.prefabs = {};
-            for (prefab_name in this.level_data.prefabs) {
-                if (this.level_data.prefabs.hasOwnProperty(prefab_name)) {
-                    this.create_prefab(prefab_name, this.level_data.prefabs[prefab_name]);
-                }
-            }
-
             this.game.input.onDown.add(this.start_swipe, this);
             this.game.input.onUp.add(this.end_swipe, this);
-        }
-    }, {
-        key: 'create_prefab',
-        value: function create_prefab(prefab_name, prefab_data) {
-            var prefab_position, prefab;
-
-            // create object according to its type
-            if (this.prefab_classes.hasOwnProperty(prefab_data.type)) {
-
-                // position is percentage
-                if (prefab_data.position.x > 0 && prefab_data.position.x <= 1) {
-                    prefab_position = new Phaser.Point(prefab_data.position.x * this.game.world.width, prefab_data.position.y * this.game.world.height);
-
-                    // position is absolute number
-                } else {
-                    prefab_position = prefab_data.position;
-                }
-                prefab = new this.prefab_classes[prefab_data.type](this, prefab_name, prefab_position, prefab_data.properties);
-            }
         }
     }, {
         key: 'start_swipe',
@@ -1000,8 +973,9 @@ var LoadingState = exports.LoadingState = function (_Phaser$State) {
 
     _createClass(LoadingState, [{
         key: "init",
-        value: function init(level_data) {
+        value: function init(level_data, next_state) {
             this.level_data = level_data;
+            this.next_state = next_state;
         }
     }, {
         key: "preload",
@@ -1028,7 +1002,7 @@ var LoadingState = exports.LoadingState = function (_Phaser$State) {
             var _this2 = this;
 
             this.time.events.add(500, function () {
-                _this2.game.trigger(_stateEvents2.default.LOADING_COMPLETED, [true, false, _this2.level_data]);
+                _this2.game.trigger(_stateEvents2.default.LOADING_COMPLETED, [true, false, _this2.level_data, _this2.next_state]);
             });
         }
     }]);
@@ -1367,6 +1341,134 @@ var FruitSpawner = exports.FruitSpawner = function (_Spawner) {
 
     return FruitSpawner;
 }(_spawner.Spawner);
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var JSONLevelState = exports.JSONLevelState = function (_Phaser$State) {
+    _inherits(JSONLevelState, _Phaser$State);
+
+    function JSONLevelState() {
+        var _ref;
+
+        var _temp, _this, _ret;
+
+        _classCallCheck(this, JSONLevelState);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = JSONLevelState.__proto__ || Object.getPrototypeOf(JSONLevelState)).call.apply(_ref, [this].concat(args))), _this), _this.prefab_classes = {}, _temp), _possibleConstructorReturn(_this, _ret);
+    }
+
+    _createClass(JSONLevelState, [{
+        key: "init",
+        value: function init(level_data) {
+            this.level_data = level_data;
+
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignVertically = true;
+        }
+    }, {
+        key: "create",
+        value: function create() {
+            var group_name, prefab_name;
+
+            this.groups = {};
+            this.level_data.groups.forEach(function (group_name) {
+                this.groups[group_name] = this.game.add.group();
+            }, this);
+
+            this.prefabs = {};
+            for (prefab_name in this.level_data.prefabs) {
+                if (this.level_data.prefabs.hasOwnProperty(prefab_name)) {
+                    this.create_prefab(prefab_name, this.level_data.prefabs[prefab_name]);
+                }
+            }
+        }
+    }, {
+        key: "create_prefab",
+        value: function create_prefab(prefab_name, prefab_data) {
+            var prefab_position, prefab;
+
+            // create object according to its type
+            if (this.prefab_classes.hasOwnProperty(prefab_data.type)) {
+
+                // position is percentage
+                if (prefab_data.position.x > 0 && prefab_data.position.x <= 1) {
+                    prefab_position = new Phaser.Point(prefab_data.position.x * this.game.world.width, prefab_data.position.y * this.game.world.height);
+
+                    // position is absolute number
+                } else {
+                    prefab_position = prefab_data.position;
+                }
+                prefab = new this.prefab_classes[prefab_data.type](this, prefab_name, prefab_position, prefab_data.properties);
+            }
+        }
+    }]);
+
+    return JSONLevelState;
+}(Phaser.State);
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.TitleState = undefined;
+
+var _jsonLevelState = __webpack_require__(27);
+
+var _prefab = __webpack_require__(2);
+
+var _textPrefab = __webpack_require__(15);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var TitleState = exports.TitleState = function (_JSONLevelState) {
+    _inherits(TitleState, _JSONLevelState);
+
+    function TitleState() {
+        _classCallCheck(this, TitleState);
+
+        var _this = _possibleConstructorReturn(this, (TitleState.__proto__ || Object.getPrototypeOf(TitleState)).call(this));
+
+        _this.prefab_classes = {
+            background: _prefab.Prefab.prototype.constructor,
+            title: _textPrefab.TextPrefab.prototype.constructor
+        };
+        return _this;
+    }
+
+    return TitleState;
+}(_jsonLevelState.JSONLevelState);
 
 /***/ })
 /******/ ]);
