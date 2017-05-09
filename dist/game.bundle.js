@@ -567,7 +567,7 @@ var Lives = exports.Lives = function (_Prefab) {
 
             _this.lives_sprites.push(life);
 
-            _this.game_state.groups.huds.add(life);
+            _this.game_state.groups[properties.group].add(life);
         }
         return _this;
     }
@@ -793,11 +793,15 @@ var _stateEvents2 = _interopRequireDefault(_stateEvents);
 
 var _bomb = __webpack_require__(9);
 
+var _bombSpawner = __webpack_require__(25);
+
 var _cut = __webpack_require__(10);
 
 var _cuttable = __webpack_require__(1);
 
 var _fruit = __webpack_require__(11);
+
+var _fruitSpawner = __webpack_require__(26);
 
 var _lives = __webpack_require__(12);
 
@@ -808,6 +812,8 @@ var _prefab = __webpack_require__(2);
 var _score = __webpack_require__(14);
 
 var _specialFruit = __webpack_require__(22);
+
+var _specialFruitSpawner = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -841,6 +847,8 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
             lives: _lives.Lives.prototype.constructor,
             cuttable: _cuttable.Cuttable.prototype.constructor,
             fruit: _fruit.Fruit.prototype.constructor,
+            fruit_spawner: _fruitSpawner.FruitSpawner.prototype.constructor,
+            special_fruit_spawner: _specialFruitSpawner.SpecialFruitSpawner.prototype.constructor,
             bomb: _bomb.Bomb.prototype.constructor,
             special_fruit: _specialFruit.SpecialFruit.prototype.constructor
         }, _this.score = 0, _temp), _possibleConstructorReturn(_this, _ret);
@@ -907,7 +915,11 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
         value: function end_swipe(pointer) {
             this.end_swipe_point = new Phaser.Point(pointer.x, pointer.y);
 
-            var swipe_length = Phaser.Point.distance(this.end_swipe_point, this.start_swipe_point);
+            if (!this.start_swipe_point) {
+                var swipe_length = 0;
+            } else {
+                var swipe_length = Phaser.Point.distance(this.end_swipe_point, this.start_swipe_point);
+            }
 
             if (swipe_length >= this.MINIMUM_SWIPE_LENGTH) {
 
@@ -1131,6 +1143,229 @@ var SpecialFruit = exports.SpecialFruit = function (_Cuttable) {
 
     return SpecialFruit;
 }(_cuttable.Cuttable);
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Spawner = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _prefab = __webpack_require__(2);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Spawner = exports.Spawner = function (_Prefab) {
+    _inherits(Spawner, _Prefab);
+
+    function Spawner(game_state, name, position, properties) {
+        _classCallCheck(this, Spawner);
+
+        var _this = _possibleConstructorReturn(this, (Spawner.__proto__ || Object.getPrototypeOf(Spawner)).call(this, game_state, name, position, properties));
+
+        _this.pool = _this.game_state.groups[properties.pool];
+
+        _this.spawn_time = properties.spawn_time;
+
+        _this.velocity_x = properties.velocity_x;
+        _this.velocity_y = properties.velocity_y;
+
+        _this.spawn_timer = _this.game_state.time.create();
+        _this.schedule_spawn();
+        return _this;
+    }
+
+    _createClass(Spawner, [{
+        key: 'schedule_spawn',
+        value: function schedule_spawn() {
+            var time;
+
+            time = this.game_state.rnd.between(this.spawn_time.min, this.spawn_time.max);
+            this.spawn_timer.add(Phaser.Timer.SECOND * time, this.spawn, this);
+            this.spawn_timer.start();
+        }
+    }, {
+        key: 'spawn',
+        value: function spawn() {
+            var object_name, object_position, object, object_velocity;
+
+            // object position - between 20% and 80% of the game width
+            object_position = new Phaser.Point(this.game_state.rnd.between(0.2 * this.game_state.game.world.width, 0.8 * this.game_state.game.world.width), this.game_state.game.world.height);
+
+            object_velocity = new Phaser.Point(this.game_state.rnd.between(this.velocity_x.min, this.velocity_x.max), this.game_state.rnd.between(this.velocity_y.min, this.velocity_y.max));
+
+            object = this.pool.getFirstDead();
+
+            if (!object) {
+                object_name = 'object_' + this.pool.countLiving();
+                object = this.create_object(object_name, object_position, object_velocity);
+            } else {
+                object.reset(object_position.x, object_position.y, object_velocity);
+            }
+
+            this.schedule_spawn();
+        }
+    }]);
+
+    return Spawner;
+}(_prefab.Prefab);
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.SpecialFruitSpawner = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _specialFruit = __webpack_require__(22);
+
+var _spawner = __webpack_require__(23);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SpecialFruitSpawner = exports.SpecialFruitSpawner = function (_Spawner) {
+    _inherits(SpecialFruitSpawner, _Spawner);
+
+    function SpecialFruitSpawner(game_state, name, position, properties) {
+        _classCallCheck(this, SpecialFruitSpawner);
+
+        return _possibleConstructorReturn(this, (SpecialFruitSpawner.__proto__ || Object.getPrototypeOf(SpecialFruitSpawner)).call(this, game_state, name, position, properties));
+    }
+
+    _createClass(SpecialFruitSpawner, [{
+        key: 'create_object',
+        value: function create_object(name, position, velocity) {
+            return new _specialFruit.SpecialFruit(this.game_state, name, position, {
+                texture: 'fruits_spritesheet',
+                group: 'special_fruits',
+                frame: 15,
+                velocity: velocity
+            });
+        }
+    }]);
+
+    return SpecialFruitSpawner;
+}(_spawner.Spawner);
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.BombSpawner = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _bomb = __webpack_require__(9);
+
+var _spawner = __webpack_require__(23);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BombSpawner = exports.BombSpawner = function (_Spawner) {
+    _inherits(BombSpawner, _Spawner);
+
+    function BombSpawner(game_state, name, position, properties) {
+        _classCallCheck(this, BombSpawner);
+
+        return _possibleConstructorReturn(this, (BombSpawner.__proto__ || Object.getPrototypeOf(BombSpawner)).call(this, game_state, name, position, properties));
+    }
+
+    _createClass(BombSpawner, [{
+        key: 'create_object',
+        value: function create_object(name, position, velocity) {
+            return new _bomb.Bomb(this.game_state, name, position, {
+                texture: 'bomb_image',
+                group: 'bombs',
+                velocity: velocity
+            });
+        }
+    }]);
+
+    return BombSpawner;
+}(_spawner.Spawner);
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.FruitSpawner = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fruit = __webpack_require__(11);
+
+var _spawner = __webpack_require__(23);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FruitSpawner = exports.FruitSpawner = function (_Spawner) {
+    _inherits(FruitSpawner, _Spawner);
+
+    function FruitSpawner(game_state, name, position, properties) {
+        _classCallCheck(this, FruitSpawner);
+
+        var _this = _possibleConstructorReturn(this, (FruitSpawner.__proto__ || Object.getPrototypeOf(FruitSpawner)).call(this, game_state, name, position, properties));
+
+        _this.frames = properties.frames;
+        return _this;
+    }
+
+    _createClass(FruitSpawner, [{
+        key: 'create_object',
+        value: function create_object(name, position, velocity) {
+            return new _fruit.Fruit(this.game_state, name, position, {
+                texture: 'fruits_spritesheet',
+                group: 'fruits',
+                frames: this.frames,
+                velocity: velocity
+            });
+        }
+    }]);
+
+    return FruitSpawner;
+}(_spawner.Spawner);
 
 /***/ })
 /******/ ]);
