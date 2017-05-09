@@ -10,7 +10,13 @@ export class Prefab extends Phaser.Sprite {
 
     this.game_state.groups[ properties.group ].add( this );
     
-    this.frame                      = properties.frame;
+    if ( properties.frame ) {
+      this.frame                    = properties.frame;
+    }
+    
+    if ( properties.anchor ) {
+      this.anchor.setTo( properties.anchor.x, properties.anchor.y );
+    }
 
     this.game_state.prefabs[ name ] = this;
   }

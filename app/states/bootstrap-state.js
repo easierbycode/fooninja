@@ -2,8 +2,9 @@ import STATE_EVENTS from '../constants/state-events';
 
 export class BootstrapState extends Phaser.State {
     
-    init( level_file ) {
+    init( level_file, next_state ) {
         this.level_file = level_file;
+        this.next_state = next_state;
     }
     
     preload() {
@@ -16,7 +17,7 @@ export class BootstrapState extends Phaser.State {
 
         this.game.trigger(
             STATE_EVENTS.BOOTSTRAP_COMPLETED,
-            [true, false, level_data]
+            [ true, false, level_data, this.next_state ]
         );
     }
 }

@@ -3,8 +3,11 @@ import STATE_EVENTS from './constants/state-events';
 import { BootstrapState } from './states/bootstrap-state';
 import { LoadingState } from './states/loading-state';
 import { LevelState } from './states/level-state';
+import { TitleState } from './states/title-state';
+
 
 export class StateManager {
+
     game = null;
 
     constructor(game) {
@@ -15,14 +18,15 @@ export class StateManager {
     }
 
     setupStates() {
-        this.game.state.add('Bootstrap', BootstrapState);
-        this.game.state.add('Loading', LoadingState);
-        this.game.state.add('GameState', LevelState);
+        this.game.state.add( 'Bootstrap', BootstrapState );
+        this.game.state.add( 'Loading', LoadingState );
+        this.game.state.add( 'GameState', LevelState );
+        this.game.state.add( 'TitleState', TitleState );
     }
 
     setupNativeListeners() {
-        this.game.state.onStateChange.add((newState, oldState) => {
-            console.debug('Enter to new state: %s', newState);
+        this.game.state.onStateChange.add(( newState, oldState ) => {
+            console.debug( 'Enter to new state: %s', newState );
         });
     }
 
@@ -32,12 +36,14 @@ export class StateManager {
         });
 
         this.game.on(STATE_EVENTS.LOADING_COMPLETED, ( paramsArr ) => {
-            this.game.state.start( 'GameState', ...paramsArr );
+            // pop last element (next_state) off paramsArr
+            var next_state  = paramsArr.pop();
+            
+            this.game.state.start( next_state, ...paramsArr );
         });
     }
 
     start() {
-        // this.game.state.start('Bootstrap');
-        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/level1.json' );
+        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState' );
     }
 }

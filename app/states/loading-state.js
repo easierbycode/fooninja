@@ -2,8 +2,9 @@ import STATE_EVENTS from '../constants/state-events';
 
 export class LoadingState extends Phaser.State {
     
-    init( level_data ) {
+    init( level_data, next_state ) {
         this.level_data = level_data;
+        this.next_state = next_state;
     }
     
     preload() {
@@ -26,7 +27,10 @@ export class LoadingState extends Phaser.State {
 
     create() {
         this.time.events.add(500, () => {
-            this.game.trigger( STATE_EVENTS.LOADING_COMPLETED, [true, false, this.level_data] );
+            this.game.trigger(
+                STATE_EVENTS.LOADING_COMPLETED,
+                [ true, false, this.level_data, this.next_state ]
+            );
         });
     }
 }
