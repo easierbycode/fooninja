@@ -850,6 +850,7 @@ var LevelState = exports.LevelState = function (_Phaser$State) {
             fruit_spawner: _fruitSpawner.FruitSpawner.prototype.constructor,
             special_fruit_spawner: _specialFruitSpawner.SpecialFruitSpawner.prototype.constructor,
             bomb: _bomb.Bomb.prototype.constructor,
+            bomb_spawner: _bombSpawner.BombSpawner.prototype.constructor,
             special_fruit: _specialFruit.SpecialFruit.prototype.constructor
         }, _this.score = 0, _temp), _possibleConstructorReturn(_this, _ret);
     }
