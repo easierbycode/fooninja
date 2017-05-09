@@ -17,6 +17,10 @@ export class TextPrefab extends Phaser.Text {
 
     this.game_state.groups[ properties.group ].add( this );
 
+    if ( properties.anchor ) {
+      this.anchor.setTo( properties.anchor.x, properties.anchor.y );
+    }
+
     this.game_state.prefabs[ name ] = this;
   }
 

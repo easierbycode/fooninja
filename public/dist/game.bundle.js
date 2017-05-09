@@ -711,6 +711,10 @@ var TextPrefab = exports.TextPrefab = function (_Phaser$Text) {
 
     _this.game_state.groups[properties.group].add(_this);
 
+    if (properties.anchor) {
+      _this.anchor.setTo(properties.anchor.x, properties.anchor.y);
+    }
+
     _this.game_state.prefabs[name] = _this;
     return _this;
   }
