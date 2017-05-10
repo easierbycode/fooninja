@@ -287,6 +287,8 @@ var _loadingState = __webpack_require__(18);
 
 var _levelState = __webpack_require__(17);
 
+var _storeState = __webpack_require__(34);
+
 var _titleState = __webpack_require__(28);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -314,6 +316,7 @@ var StateManager = exports.StateManager = function () {
             this.game.state.add('Loading', _loadingState.LoadingState);
             this.game.state.add('GameState', _levelState.LevelState);
             this.game.state.add('TitleState', _titleState.TitleState);
+            this.game.state.add('StoreState', _storeState.StoreState);
         }
     }, {
         key: 'setupNativeListeners',
@@ -931,7 +934,9 @@ var LevelState = exports.LevelState = function (_JSONLevelState) {
     }, {
         key: 'game_over',
         value: function game_over() {
-            this.game.state.restart(true, false, this.level_data);
+            this.game.state.start('Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState');
+
+            localStorage.money += this.score;
         }
     }]);
 
@@ -1504,6 +1509,8 @@ var TitleState = exports.TitleState = function (_JSONLevelState) {
             };
 
             menu = new _menu.Menu(this, 'menu', menu_position, menu_properties);
+
+            localStorage.money = localStorage.money || 1000;
         }
     }]);
 
@@ -1687,6 +1694,207 @@ var Menu = exports.Menu = function (_Prefab) {
 
     return Menu;
 }(_prefab.Prefab);
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Money = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _textPrefab = __webpack_require__(15);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Money = exports.Money = function (_TextPrefab) {
+    _inherits(Money, _TextPrefab);
+
+    function Money(game_state, name, position, properties) {
+        _classCallCheck(this, Money);
+
+        return _possibleConstructorReturn(this, (Money.__proto__ || Object.getPrototypeOf(Money)).call(this, game_state, name, position, properties));
+    }
+
+    _createClass(Money, [{
+        key: 'update',
+        value: function update() {
+            this.text = 'Money: ' + localStorage.money;
+        }
+    }]);
+
+    return Money;
+}(_textPrefab.TextPrefab);
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.UpgradeItem = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _menuItem = __webpack_require__(29);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var UpgradeItem = exports.UpgradeItem = function (_MenuItem) {
+    _inherits(UpgradeItem, _MenuItem);
+
+    function UpgradeItem(game_state, name, position, properties) {
+        _classCallCheck(this, UpgradeItem);
+
+        var _this = _possibleConstructorReturn(this, (UpgradeItem.__proto__ || Object.getPrototypeOf(UpgradeItem)).call(this, game_state, name, position, properties));
+
+        _this.description = properties.description;
+        _this.price = properties.price;
+
+        _this.selected = false;
+        return _this;
+    }
+
+    _createClass(UpgradeItem, [{
+        key: 'selection_over',
+        value: function selection_over() {
+            _get(UpgradeItem.prototype.__proto__ || Object.getPrototypeOf(UpgradeItem.prototype), 'selection_over', this).call(this);
+
+            this.game_state.prefabs.upgrade_description.text = this.description;
+            this.game_state.prefabs.upgrade_price.text = this.price;
+        }
+    }, {
+        key: 'selection_out',
+        value: function selection_out() {
+            _get(UpgradeItem.prototype.__proto__ || Object.getPrototypeOf(UpgradeItem.prototype), 'selection_out', this).call(this);
+
+            this.game_state.prefabs.upgrade_description.text = '';
+            this.game_state.prefabs.upgrade_price.text = '';
+        }
+    }, {
+        key: 'select',
+        value: function select() {
+            if (!this.selected && localStorage.money >= this.price) {
+                localStorage.money -= this.price;
+                this.selected = true;
+            }
+        }
+    }]);
+
+    return UpgradeItem;
+}(_menuItem.MenuItem);
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.StoreState = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _jsonLevelState = __webpack_require__(27);
+
+var _menu = __webpack_require__(31);
+
+var _money = __webpack_require__(32);
+
+var _prefab = __webpack_require__(2);
+
+var _textPrefab = __webpack_require__(15);
+
+var _upgradeItem = __webpack_require__(33);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var StoreState = exports.StoreState = function (_JSONLevelState) {
+    _inherits(StoreState, _JSONLevelState);
+
+    function StoreState() {
+        var _ref;
+
+        var _temp, _this, _ret;
+
+        _classCallCheck(this, StoreState);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = StoreState.__proto__ || Object.getPrototypeOf(StoreState)).call.apply(_ref, [this].concat(args))), _this), _this.prefab_classes = {
+            background: _prefab.Prefab.prototype.constructor,
+            title: _textPrefab.TextPrefab.prototype.constructor,
+            money: _money.Money.prototype.constructor,
+            text: _textPrefab.TextPrefab.prototype.constructor,
+            upgrade_item: _upgradeItem.UpgradeItem.prototype.constructor
+        }, _temp), _possibleConstructorReturn(_this, _ret);
+    }
+
+    _createClass(StoreState, [{
+        key: 'create',
+        value: function create() {
+            var menu_position, menu_items, menu_properties, menu;
+
+            _get(StoreState.prototype.__proto__ || Object.getPrototypeOf(StoreState.prototype), 'create', this).call(this);
+
+            // adding menu
+            menu_position = new Phaser.Point(0, 0);
+            menu_items = [];
+
+            this.groups.menu_items.forEach(function (menu_item) {
+                menu_items.push(menu_item);
+            }, this);
+
+            menu_properties = {
+                texture: '',
+                group: 'background',
+                menu_items: menu_items
+            };
+
+            menu = new _menu.Menu(this, 'menu', menu_position, menu_properties);
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            if (this.game.input.keyboard.isDown(Phaser.Keyboard.ESC)) {
+                this.game.state.start('Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState');
+            }
+        }
+    }]);
+
+    return StoreState;
+}(_jsonLevelState.JSONLevelState);
 
 /***/ })
 /******/ ]);

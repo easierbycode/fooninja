@@ -106,6 +106,8 @@ export class LevelState extends JSONLevelState {
     }
     
     game_over() {
-        this.game.state.restart( true, false, this.level_data );
+        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState' );
+        
+        localStorage.money  += this.score;
     }
 }
