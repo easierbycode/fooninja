@@ -17,7 +17,7 @@ export class TitleState extends JSONLevelState {
     create() {
         var menu_position, menu_items, menu_properties, menu;
         
-        JSONLevelState.prototype.create.call( this );
+        super.create.call( this );
         
         menu_position   = new Phaser.Point( 0, 0 );
         menu_items      = [];

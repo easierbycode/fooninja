@@ -1,17 +1,14 @@
+
 import GAME from '../constants/game';
 import PLAYER from '../constants/player';
 import STATE_EVENTS from '../constants/state-events';
-import { Bomb } from '../models/bomb';
 import { BombSpawner } from '../models/bomb-spawner';
 import { Cut } from '../models/cut';
-import { Cuttable } from '../models/cuttable';
-import { Fruit } from '../models/fruit';
 import { FruitSpawner } from '../models/fruit-spawner';
 import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
 import { Score } from '../models/score';
-import { SpecialFruit } from '../models/special-fruit';
 import { SpecialFruitSpawner } from '../models/special-fruit-spawner';
 import { JSONLevelState } from './json-level-state';
 
@@ -30,22 +27,18 @@ export class LevelState extends JSONLevelState {
         background              : Prefab.prototype.constructor,
         score                   : Score.prototype.constructor,
         lives                   : Lives.prototype.constructor,
-        cuttable                : Cuttable.prototype.constructor,
-        fruit                   : Fruit.prototype.constructor,
         fruit_spawner           : FruitSpawner.prototype.constructor,
         special_fruit_spawner   : SpecialFruitSpawner.prototype.constructor,
-        bomb                    : Bomb.prototype.constructor,
-        bomb_spawner            : BombSpawner.prototype.constructor,
-        special_fruit           : SpecialFruit.prototype.constructor
+        bomb_spawner            : BombSpawner.prototype.constructor
     }
-    
-    score       = 0;
     
     init( level_data ) {
         super.init.call( this, level_data );
         
         this.game.physics.startSystem( Phaser.Physics.ARCADE );
-        this.game.physics.arcade.gravity.y  = GAME.gravity;
+        
+        this.game.physics.arcade.gravity.y  = GAME.GRAVITY;
+        this.score                          = 0;
     }
     
     create() {
