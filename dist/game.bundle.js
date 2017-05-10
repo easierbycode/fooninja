@@ -809,15 +809,9 @@ var _stateEvents = __webpack_require__(0);
 
 var _stateEvents2 = _interopRequireDefault(_stateEvents);
 
-var _bomb = __webpack_require__(9);
-
 var _bombSpawner = __webpack_require__(25);
 
 var _cut = __webpack_require__(10);
-
-var _cuttable = __webpack_require__(1);
-
-var _fruit = __webpack_require__(11);
 
 var _fruitSpawner = __webpack_require__(26);
 
@@ -828,8 +822,6 @@ var _player3 = __webpack_require__(13);
 var _prefab = __webpack_require__(2);
 
 var _score = __webpack_require__(14);
-
-var _specialFruit = __webpack_require__(22);
 
 var _specialFruitSpawner = __webpack_require__(24);
 
@@ -865,14 +857,10 @@ var LevelState = exports.LevelState = function (_JSONLevelState) {
             background: _prefab.Prefab.prototype.constructor,
             score: _score.Score.prototype.constructor,
             lives: _lives.Lives.prototype.constructor,
-            cuttable: _cuttable.Cuttable.prototype.constructor,
-            fruit: _fruit.Fruit.prototype.constructor,
             fruit_spawner: _fruitSpawner.FruitSpawner.prototype.constructor,
             special_fruit_spawner: _specialFruitSpawner.SpecialFruitSpawner.prototype.constructor,
-            bomb: _bomb.Bomb.prototype.constructor,
-            bomb_spawner: _bombSpawner.BombSpawner.prototype.constructor,
-            special_fruit: _specialFruit.SpecialFruit.prototype.constructor
-        }, _this.score = 0, _temp), _possibleConstructorReturn(_this, _ret);
+            bomb_spawner: _bombSpawner.BombSpawner.prototype.constructor
+        }, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
     _createClass(LevelState, [{
@@ -881,7 +869,9 @@ var LevelState = exports.LevelState = function (_JSONLevelState) {
             _get(LevelState.prototype.__proto__ || Object.getPrototypeOf(LevelState.prototype), 'init', this).call(this, level_data);
 
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
-            this.game.physics.arcade.gravity.y = _game2.default.gravity;
+
+            this.game.physics.arcade.gravity.y = _game2.default.GRAVITY;
+            this.score = 0;
         }
     }, {
         key: 'create',
@@ -1454,6 +1444,8 @@ exports.TitleState = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _jsonLevelState = __webpack_require__(27);
 
 var _menu = __webpack_require__(31);
@@ -1496,7 +1488,7 @@ var TitleState = exports.TitleState = function (_JSONLevelState) {
         value: function create() {
             var menu_position, menu_items, menu_properties, menu;
 
-            _jsonLevelState.JSONLevelState.prototype.create.call(this);
+            _get(TitleState.prototype.__proto__ || Object.getPrototypeOf(TitleState.prototype), 'create', this).call(this);
 
             menu_position = new Phaser.Point(0, 0);
             menu_items = [];
