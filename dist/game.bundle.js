@@ -936,7 +936,7 @@ var LevelState = exports.LevelState = function (_JSONLevelState) {
         value: function game_over() {
             this.game.state.start('Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState');
 
-            localStorage.money += this.score;
+            localStorage.money = Number(localStorage.money) + this.score;
         }
     }]);
 
