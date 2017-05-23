@@ -139,6 +139,32 @@
                     "max": 1000
                 }
             }
+        },
+        
+        "leaderboard": {
+            "type": "leaderboard",
+            "position": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "properties": {
+                "texture": "",
+                "group": "hud",
+                "number_of_scores": 5,
+                "text_properties": {
+                    "text": "",
+                    "group": "hud",
+                    "style": {
+                        "font": "32px Arial",
+                        "fill": "#fff"
+                    },
+                    "anchor": {
+                        "x": 0.5,
+                        "y": 0.5
+                    }
+                },
+                "scores_spacing": 50
+            }
         }
         
     }

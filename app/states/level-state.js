@@ -5,6 +5,7 @@ import STATE_EVENTS from '../constants/state-events';
 import { BombSpawner } from '../models/bomb-spawner';
 import { Cut } from '../models/cut';
 import { FruitSpawner } from '../models/fruit-spawner';
+import { Leaderboard } from '../models/leaderboard';
 import { Lives } from '../models/lives';
 import { Player } from '../models/player';
 import { Prefab } from '../models/prefab';
@@ -29,7 +30,8 @@ export class LevelState extends JSONLevelState {
         lives                   : Lives.prototype.constructor,
         fruit_spawner           : FruitSpawner.prototype.constructor,
         special_fruit_spawner   : SpecialFruitSpawner.prototype.constructor,
-        bomb_spawner            : BombSpawner.prototype.constructor
+        bomb_spawner            : BombSpawner.prototype.constructor,
+        leaderboard             : Leaderboard.prototype.constructor
     }
     
     init( level_data ) {
@@ -106,8 +108,31 @@ export class LevelState extends JSONLevelState {
     }
     
     game_over() {
-        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState' );
+        // this.game.state.start( 'Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState' );
         
-        localStorage.money  = Number( localStorage.money ) + this.score;
+        // localStorage.money  = Number( localStorage.money ) + this.score;
+        
+        this.game.money         += this.score;
+        this.game.max_score     = Math.max( this.game.max_score, this.score );
+        
+        var auth_data           = this.game.global.database.getAuth();
+        
+        this.game.global.database
+            .child( 'players' )
+            .child( auth_data.uid )
+            .set({
+                    name        : this.game.player_name,
+                    money       : this.game.money,
+                    max_score   :this.game.max_score
+                },
+                
+                // inside callback ensures leaderboard is
+                //  only shown after database is updated
+                this.show_leaderboard.bind( this )
+            );
+    }
+    
+    show_leaderboard() {
+        this.prefabs.leaderboard.show_leaderboard();
     }
 }

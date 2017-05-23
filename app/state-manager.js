@@ -2,6 +2,7 @@ import STATE_EVENTS from './constants/state-events';
 
 import { BootstrapState } from './states/bootstrap-state';
 import { LoadingState } from './states/loading-state';
+import { LoginState } from './states/login-state';
 import { LevelState } from './states/level-state';
 import { StoreState } from './states/store-state';
 import { TitleState } from './states/title-state';
@@ -21,6 +22,7 @@ export class StateManager {
     setupStates() {
         this.game.state.add( 'Bootstrap', BootstrapState );
         this.game.state.add( 'Loading', LoadingState );
+        this.game.state.add( 'LoginState', LoginState );
         this.game.state.add( 'GameState', LevelState );
         this.game.state.add( 'TitleState', TitleState );
         this.game.state.add( 'StoreState', StoreState );
@@ -46,6 +48,6 @@ export class StateManager {
     }
 
     start() {
-        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/title-screen.json', 'TitleState' );
+        this.game.state.start( 'Bootstrap', true, false, 'assets/levels/login-screen.json', 'LoginState' );
     }
 }

@@ -33,7 +33,5 @@ export class TitleState extends JSONLevelState {
         }
         
         menu    = new Menu( this, 'menu', menu_position, menu_properties );
-        
-        localStorage.money  = localStorage.money || 1000;
     }
 }
